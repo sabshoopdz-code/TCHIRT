@@ -119,6 +119,8 @@
     .modal-product{color:var(--purple-bright);margin-bottom:20px;font-weight:700;}
     .modal label{display:block;font-size:.95rem;color:var(--white);margin-bottom:8px;}
     .modal input,.modal select,.modal textarea{width:100%;padding:12px;background:var(--bg-elev);border:1px solid rgba(124,77,255,.2);color:#fff;border-radius:8px;margin-bottom:15px;}
+    .modal select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-left:48px;border-color:var(--purple-bright);font-weight:700;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 14px center;background-size:22px;}
+    .modal select:focus{outline:2px solid var(--purple-bright);outline-offset:1px;}
     
     /* تصميم مكان التوصيل المطابق للصورة تماماً */
     .delivery-group {
@@ -745,17 +747,17 @@
         <span class="title">طريقة التوصيل</span>
         <label class="delivery-item">
           <span class="right-side">
-            <input type="radio" name="delivery" value="400" checked onchange="updateTotal()">
+            <input id="homeDelivery" type="radio" name="delivery" value="0" checked onchange="updateTotal()">
             <span class="label-text">التوصيل إلى المنزل</span>
           </span>
-          <span class="price-text">400 دج</span>
+          <span class="price-text" id="homeDeliveryPrice">اختر الولاية</span>
         </label>
         <label class="delivery-item">
           <span class="right-side">
-            <input type="radio" name="delivery" value="250" onchange="updateTotal()">
+            <input id="officeDelivery" type="radio" name="delivery" value="0" onchange="updateTotal()">
             <span class="label-text">استلام من المكتب</span>
           </span>
-          <span class="price-text">250 دج</span>
+          <span class="price-text" id="officeDeliveryPrice">اختر الولاية</span>
         </label>
       </div>
 
@@ -797,6 +799,30 @@
   const GROUP_CHAT_ID = '-1004472365134';
   const telegramRequests = [];
 
+  const deliveryRates = {
+    'تلمسان': [500, 400], 'الجزائر': [500, 400],
+    'سيدي بلعباس': [550, 450], 'عين تموشنت': [550, 450],
+    'أم البواقي': [700, 600], 'باتنة': [700, 600], 'بجاية': [700, 600],
+    'البليدة': [700, 600], 'البويرة': [700, 600], 'تيارت': [700, 600],
+    'تيزي وزو': [700, 600], 'جيجل': [700, 600], 'سطيف': [700, 600],
+    'سعيدة': [700, 600], 'سكيكدة': [700, 600], 'عنابة': [700, 600],
+    'قالمة': [700, 600], 'قسنطينة': [700, 600], 'المدية': [700, 600],
+    'مستغانم': [700, 600], 'المسيلة': [700, 600], 'معسكر': [700, 600],
+    'وهران': [700, 600], 'برج بوعريريج': [700, 600], 'بومرداس': [700, 600],
+    'الطارف': [700, 600], 'تيسمسيلت': [700, 600], 'خنشلة': [700, 600],
+    'سوق أهراس': [700, 600], 'تيبازة': [700, 600], 'ميلة': [700, 600],
+    'عين الدفلى': [700, 600], 'النعامة': [700, 600], 'غليزان': [700, 600],
+    'الأغواط': [700, 600], 'الشلف': [700, 600],
+    'بسكرة': [850, 700], 'بشار': [850, 700], 'تبسة': [850, 700],
+    'الجلفة': [850, 700], 'ورقلة': [850, 700], 'الوادي': [850, 700],
+    'غرداية': [850, 700], 'أولاد جلال': [850, 700], 'بني عباس': [850, 700],
+    'تقرت': [850, 700], 'المغير': [850, 700], 'المنيعة': [850, 700],
+    'أدرار': [1650, 1550], 'البيض': [1650, 1550], 'تيميمون': [1650, 1550],
+    'برج باجي مختار': [1650, 1550], 'تمنراست': [1650, 1550],
+    'إليزي': [1650, 1550], 'جانت': [1650, 1550], 'إن صالح': [1650, 1550],
+    'إن قزام': [1650, 1550], 'تندوف': [1650, 1550]
+  };
+
   let currentProduct = '';
   let currentPrice = 2000;
 
@@ -811,12 +837,33 @@
     document.getElementById('productPrice').textContent = formatDzd(price);
     document.getElementById('orderModal').classList.add('open');
     document.body.style.overflow = 'hidden';
-    updateTotal();
+    updateDeliveryPrices();
   }
 
   function closeOrder() {
     document.getElementById('orderModal').classList.remove('open');
     document.body.style.overflow = '';
+  }
+
+  function updateDeliveryPrices() {
+    const rates = deliveryRates[document.getElementById('wilaya').value];
+    const homeInput = document.getElementById('homeDelivery');
+    const officeInput = document.getElementById('officeDelivery');
+
+    if (!rates) {
+      homeInput.value = 0;
+      officeInput.value = 0;
+      document.getElementById('homeDeliveryPrice').textContent = 'اختر الولاية';
+      document.getElementById('officeDeliveryPrice').textContent = 'اختر الولاية';
+      updateTotal();
+      return;
+    }
+
+    homeInput.value = rates[0];
+    officeInput.value = rates[1];
+    document.getElementById('homeDeliveryPrice').textContent = formatDzd(rates[0]);
+    document.getElementById('officeDeliveryPrice').textContent = formatDzd(rates[1]);
+    updateTotal();
   }
 
   function updateTotal() {
@@ -825,6 +872,8 @@
     document.getElementById('deliveryPrice').textContent = formatDzd(deliveryPrice);
     document.getElementById('totalPrice').textContent = formatDzd(currentPrice + deliveryPrice);
   }
+
+  document.getElementById('wilaya').addEventListener('change', updateDeliveryPrices);
 
   function sendTelegramMessage(chatId, text) {
     if (!chatId || chatId.includes('PUT_YOUR')) return;
