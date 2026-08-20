@@ -171,6 +171,11 @@
     footer{text-align:center;padding:50px 6vw;background:#050507;border-top:1px solid #111;}
     .contact-links{display:flex;justify-content:center;gap:15px;margin-bottom:20px;flex-wrap:wrap;}
     .contact-links a{border:1px solid var(--gold);color:var(--gold);padding:10px 20px;border-radius:30px;text-decoration:none;font-weight:700;}
+    .contact-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:430px;margin:0 auto 25px;}
+    .contact-btn{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:10px;color:#fff;text-decoration:none;font-weight:900;padding:10px 12px;}
+    .contact-btn.facebook{background:#1877f2;}
+    .contact-btn.whatsapp{background:#25d366;}
+    .contact-btn.call{background:var(--purple);grid-column:1 / -1;width:calc(50% - 6px);justify-self:center;}
   </style>
 </head>
 <body>
@@ -654,6 +659,16 @@
     <p class="modal-product" id="selectedProduct">المنتج المختار</p>
 
     <form id="orderForm" onsubmit="submitOrder(event)">
+      <label for="size">المقاس</label>
+      <select id="size" name="size" required>
+        <option value="" selected disabled>اختر المقاس</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+      </select>
+
       <label for="customerName">الاسم الكامل</label>
       <input id="customerName" name="customerName" type="text" required autocomplete="name" placeholder="اكتب اسمك الكامل">
 
@@ -661,7 +676,67 @@
       <input id="customerPhone" name="customerPhone" type="tel" required inputmode="tel" autocomplete="tel" placeholder="مثال: 05xxxxxxxx">
 
       <label for="wilaya">الولاية</label>
-      <input id="wilaya" name="wilaya" type="text" required placeholder="اكتب اسم ولايتك">
+      <select id="wilaya" name="wilaya" required>
+        <option value="" selected disabled>اختر ولايتك</option>
+        <option value="أدرار">01 - أدرار</option>
+        <option value="الشلف">02 - الشلف</option>
+        <option value="الأغواط">03 - الأغواط</option>
+        <option value="أم البواقي">04 - أم البواقي</option>
+        <option value="باتنة">05 - باتنة</option>
+        <option value="بجاية">06 - بجاية</option>
+        <option value="بسكرة">07 - بسكرة</option>
+        <option value="بشار">08 - بشار</option>
+        <option value="البليدة">09 - البليدة</option>
+        <option value="البويرة">10 - البويرة</option>
+        <option value="تمنراست">11 - تمنراست</option>
+        <option value="تبسة">12 - تبسة</option>
+        <option value="تلمسان">13 - تلمسان</option>
+        <option value="تيارت">14 - تيارت</option>
+        <option value="تيزي وزو">15 - تيزي وزو</option>
+        <option value="الجزائر">16 - الجزائر</option>
+        <option value="الجلفة">17 - الجلفة</option>
+        <option value="جيجل">18 - جيجل</option>
+        <option value="سطيف">19 - سطيف</option>
+        <option value="سعيدة">20 - سعيدة</option>
+        <option value="سكيكدة">21 - سكيكدة</option>
+        <option value="سيدي بلعباس">22 - سيدي بلعباس</option>
+        <option value="عنابة">23 - عنابة</option>
+        <option value="قالمة">24 - قالمة</option>
+        <option value="قسنطينة">25 - قسنطينة</option>
+        <option value="المدية">26 - المدية</option>
+        <option value="مستغانم">27 - مستغانم</option>
+        <option value="المسيلة">28 - المسيلة</option>
+        <option value="معسكر">29 - معسكر</option>
+        <option value="ورقلة">30 - ورقلة</option>
+        <option value="وهران">31 - وهران</option>
+        <option value="البيض">32 - البيض</option>
+        <option value="إليزي">33 - إليزي</option>
+        <option value="برج بوعريريج">34 - برج بوعريريج</option>
+        <option value="بومرداس">35 - بومرداس</option>
+        <option value="الطارف">36 - الطارف</option>
+        <option value="تندوف">37 - تندوف</option>
+        <option value="تيسمسيلت">38 - تيسمسيلت</option>
+        <option value="الوادي">39 - الوادي</option>
+        <option value="خنشلة">40 - خنشلة</option>
+        <option value="سوق أهراس">41 - سوق أهراس</option>
+        <option value="تيبازة">42 - تيبازة</option>
+        <option value="ميلة">43 - ميلة</option>
+        <option value="عين الدفلى">44 - عين الدفلى</option>
+        <option value="النعامة">45 - النعامة</option>
+        <option value="عين تموشنت">46 - عين تموشنت</option>
+        <option value="غرداية">47 - غرداية</option>
+        <option value="غليزان">48 - غليزان</option>
+        <option value="تيميمون">49 - تيميمون</option>
+        <option value="برج باجي مختار">50 - برج باجي مختار</option>
+        <option value="أولاد جلال">51 - أولاد جلال</option>
+        <option value="بني عباس">52 - بني عباس</option>
+        <option value="إن صالح">53 - إن صالح</option>
+        <option value="إن قزام">54 - إن قزام</option>
+        <option value="تقرت">55 - تقرت</option>
+        <option value="جانت">56 - جانت</option>
+        <option value="المغير">57 - المغير</option>
+        <option value="المنيعة">58 - المنيعة</option>
+      </select>
 
       <label for="address">العنوان</label>
       <textarea id="address" name="address" required rows="3" placeholder="الحي، البلدية، وأي تفاصيل مفيدة للتوصيل"></textarea>
@@ -705,6 +780,13 @@
   <div class="contact-links">
     <span>الدفع عند الاستلام والتوصيل متوفر لكل الولايات</span>
   </div>
+
+  <div class="contact-buttons">
+    <a class="contact-btn facebook" href="https://www.facebook.com/profile.php?id=100069958035941" target="_blank" rel="noopener">فيسبوك</a>
+    <a class="contact-btn whatsapp" href="https://wa.me/213794030957" target="_blank" rel="noopener">واتساب</a>
+    <a class="contact-btn call" href="tel:0794030957">اتصال مباشر</a>
+  </div>
+
   <p>© 2026 SABSHOP DZ — جميع الحقوق محفوظة</p>
 </footer>
 
@@ -771,12 +853,14 @@
     const deliveryPrice = Number(selectedDelivery.value);
     const deliveryMethod = selectedDelivery.parentElement.querySelector('.label-text').textContent.trim();
     const customerName = document.getElementById('customerName').value.trim();
+    const selectedSize = document.getElementById('size').value;
     const total = currentPrice + deliveryPrice;
 
     const message = [
       'طلب جديد — SABSHOP DZ',
       '',
       'المنتج: ' + currentProduct,
+      'المقاس: ' + selectedSize,
       'سعر التشرت: ' + currentPrice + ' دج',
       'الاسم: ' + customerName,
       'الهاتف: ' + document.getElementById('customerPhone').value.trim(),
