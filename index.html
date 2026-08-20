@@ -103,6 +103,13 @@
     .price-tag{color:var(--purple-bright);font-weight:900;font-size:1.3rem;}
     .order-btn{background:var(--purple);color:#fff;border:none;border-radius:7px;padding:10px 20px;font-weight:700;cursor:pointer;}
 
+    /* تكبير صور المنتجات */
+    .img-wrap{cursor:zoom-in;}
+    .image-modal{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;}
+    .image-modal.open{display:flex;}
+    .image-modal img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:10px;}
+    .close-image{position:absolute;top:18px;left:18px;background:none;border:none;color:#fff;font-size:2.2rem;cursor:pointer;line-height:1;}
+
     /* Modal */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
     .overlay.open{display:flex;}
@@ -688,6 +695,12 @@
   </div>
 </div>
 
+<!-- نافذة تكبير صور التشرتات -->
+<div class="image-modal" id="imageModal" onclick="closeImage(event)">
+  <button class="close-image" type="button" onclick="closeImage(event)" aria-label="إغلاق">×</button>
+  <img id="largeImage" src="" alt="">
+</div>
+
 <footer>
   <div class="contact-links">
     <span>الدفع عند الاستلام والتوصيل متوفر لكل الولايات</span>
@@ -781,6 +794,32 @@
     form.reset();
     closeOrder();
   }
+
+  const imageModal = document.getElementById('imageModal');
+  const largeImage = document.getElementById('largeImage');
+
+  document.querySelectorAll('.img-wrap img').forEach(function (image) {
+    image.addEventListener('click', function () {
+      largeImage.src = image.src;
+      largeImage.alt = image.alt;
+      imageModal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function closeImage(event) {
+    if (event.target === imageModal || event.target.classList.contains('close-image')) {
+      imageModal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && imageModal.classList.contains('open')) {
+      imageModal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
 
   document.getElementById('orderModal').addEventListener('click', function (event) {
     if (event.target === this) closeOrder();
