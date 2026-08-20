@@ -938,9 +938,21 @@
       form.reset();
       closeOrder();
     } else {
-      // لم يصل الطلب فعلياً - أخبر المستخدم بدل رسالة نجاح كاذبة
       console.error('تفاصيل الفشل:', result);
-      alert('تعذّر إرسال الطلب. افتح "أدوات المطور" (Console) في المتصفح لمعرفة سبب الخطأ بالتفصيل، أو تواصل معنا عبر واتساب مباشرة.');
+      const errorText = String(result.error || 'سبب غير معروف');
+      let userMessage = 'تعذّر إرسال الطلب.\n\nالسبب: ' + errorText;
+
+      if (errorText.includes('missing_worker_secrets')) {
+        userMessage = 'تعذّر إرسال الطلب.\n\nالسبب: قيم Cloudflare السرية غير مكتملة.';
+      } else if (errorText.includes('chat not found')) {
+        userMessage = 'تعذّر إرسال الطلب.\n\nالسبب: معرّف الحساب أو المجموعة غير صحيح.';
+      } else if (errorText.includes('bot was blocked')) {
+        userMessage = 'تعذّر إرسال الطلب.\n\nالسبب: افتح البوت في تيليغرام واضغط بدء ثم أعد المحاولة.';
+      } else if (errorText.includes('bot is not a member')) {
+        userMessage = 'تعذّر إرسال الطلب.\n\nالسبب: أضف البوت إلى المجموعة واجعله مشرفًا.';
+      }
+
+      alert(userMessage);
     }
   }
 
