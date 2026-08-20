@@ -793,11 +793,9 @@
 </footer>
 
 <script>
-  // املأ التوكن ومعرّف المجموعة بنفسك قبل رفع الملف.
-  const TELEGRAM_BOT_TOKEN = '8768301615:AAGUsUh12uX6AppdG7evAgiJR4NYbZwKlRM';
-  const PERSONAL_CHAT_ID = '7081323585';
-  const GROUP_CHAT_ID = '-1004472365134';
-  const telegramRequests = [];
+  // رابط الـ Worker الخاص بك على Cloudflare (بعد نشره). ضعه هنا بدل التوكن.
+  // مثال: 'https://sabshop-orders.your-subdomain.workers.dev'
+  const ORDER_ENDPOINT = 'https://blue-block-c1ed.sabshoop-dz.workers.dev';
 
   const deliveryRates = {
     'تلمسان': [500, 400], 'الجزائر': [500, 400],
@@ -875,29 +873,38 @@
 
   document.getElementById('wilaya').addEventListener('change', updateDeliveryPrices);
 
-  function sendTelegramMessage(chatId, text) {
-    if (!chatId || chatId.includes('PUT_YOUR')) return;
+  // يرسل تفاصيل الطلب إلى الـ Worker (وليس إلى تيليغرام مباشرة).
+  // الـ Worker هو من يحمل التوكن ويرسل فعلياً - بذلك لا يظهر التوكن هنا إطلاقاً.
+  async function sendOrderToServer(text) {
+    try {
+      const response = await fetch(ORDER_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      });
+      const data = await response.json().catch(function () { return null; });
 
-    const query = new URLSearchParams({ chat_id: chatId, text: text });
-    const request = new Image();
-    request.src = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?${query.toString()}`;
-    telegramRequests.push(request);
-
-    setTimeout(function () {
-      const index = telegramRequests.indexOf(request);
-      if (index !== -1) telegramRequests.splice(index, 1);
-    }, 60000);
+      if (!response.ok || !data || data.ok !== true) {
+        console.error('فشل إرسال الطلب عبر الخادم', data);
+        return { ok: false, error: data ? JSON.stringify(data.details) : ('HTTP ' + response.status) };
+      }
+      return { ok: true };
+    } catch (err) {
+      console.error('خطأ شبكة عند الاتصال بالخادم', err);
+      return { ok: false, error: err.message };
+    }
   }
 
-  function submitOrder(event) {
+  async function submitOrder(event) {
     event.preventDefault();
 
-    if (TELEGRAM_BOT_TOKEN.includes('PUT_YOUR_BOT_TOKEN_HERE')) {
-      alert('ضع التوكن في TELEGRAM_BOT_TOKEN أولاً.');
+    if (ORDER_ENDPOINT.includes('PUT_YOUR_WORKER_URL_HERE')) {
+      alert('اربط ORDER_ENDPOINT برابط الـ Worker الخاص بك أولاً.');
       return;
     }
 
     const form = event.target;
+    const submitBtn = form.querySelector('button[type=submit]');
     const selectedDelivery = document.querySelector('input[name="delivery"]:checked');
     const deliveryPrice = Number(selectedDelivery.value);
     const deliveryMethod = selectedDelivery.parentElement.querySelector('.label-text').textContent.trim();
@@ -920,12 +927,21 @@
       'المجموع: ' + total + ' دج'
     ].join('\n');
 
-    sendTelegramMessage(PERSONAL_CHAT_ID, message);
-    sendTelegramMessage(GROUP_CHAT_ID, message);
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'جارٍ الإرسال...'; }
 
-    alert(`شكراً ${customerName}، تم إرسال طلبك بنجاح.`);
-    form.reset();
-    closeOrder();
+    const result = await sendOrderToServer(message);
+
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'تأكيد الطلب'; }
+
+    if (result.ok) {
+      alert(`شكراً ${customerName}، تم إرسال طلبك بنجاح.`);
+      form.reset();
+      closeOrder();
+    } else {
+      // لم يصل الطلب فعلياً - أخبر المستخدم بدل رسالة نجاح كاذبة
+      console.error('تفاصيل الفشل:', result);
+      alert('تعذّر إرسال الطلب. افتح "أدوات المطور" (Console) في المتصفح لمعرفة سبب الخطأ بالتفصيل، أو تواصل معنا عبر واتساب مباشرة.');
+    }
   }
 
   const imageModal = document.getElementById('imageModal');
