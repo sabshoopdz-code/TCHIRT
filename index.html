@@ -965,6 +965,10 @@
 
     if (result.ok) {
       alert(`شكراً ${customerName}، تم إرسال طلبك بنجاح.`);
+      fbq('track', 'Purchase', {
+    value: total,
+    currency: 'DZD'
+});
       form.reset();
       closeOrder();
     } else {
